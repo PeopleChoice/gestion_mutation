@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide de Déploiement — Gestion des Mutations</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 10.5pt; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e1e1e;
+    background: #f4f4f4;
+    line-height: 1.55;
+  }
+
+  /* ===== PAGE LAYOUT ===== */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 12mm auto;
+    background: #fff;
+    padding: 18mm 18mm 22mm 18mm;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    position: relative;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 257mm;
+  }
+  .cover-badge {
+    background: #5D4E37;
+    color: #C8A951;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 18px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+  }
+  .cover h1 {
+    font-size: 26pt;
+    font-weight: 800;
+    color: #5D4E37;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .cover h2 {
+    font-size: 14pt;
+    font-weight: 400;
+    color: #7a6651;
+    margin-bottom: 40px;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, #C8A951, #5D4E37);
+    border-radius: 2px;
+    margin: 0 auto 40px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item {
+    text-align: center;
+  }
+  .cover-meta-item .label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #999;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item .value {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #5D4E37;
+  }
+  .cover-footer {
+    position: absolute;
+    bottom: 22mm;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 8.5pt;
+    color: #bbb;
+  }
+  .cover-logo-box {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #5D4E37, #3A2F1E);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    box-shadow: 0 8px 24px rgba(93,78,55,0.25);
+  }
+  .cover-logo-box svg { width: 48px; height: 48px; fill: #C8A951; }
+
+  /* ===== HEADER (pages intérieures) ===== */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #5D4E37;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+  }
+  .page-header .app-name {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #5D4E37;
+    letter-spacing: 0.5px;
+  }
+  .page-header .doc-title {
+    font-size: 8.5pt;
+    color: #999;
+  }
+
+  /* ===== PAGE FOOTER ===== */
+  .page-footer {
+    position: absolute;
+    bottom: 10mm;
+    left: 18mm; right: 18mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8pt;
+    color: #bbb;
+    border-top: 1px solid #eee;
+    padding-top: 6px;
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  h1.section-title {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #5D4E37;
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #5D4E37;
+    margin: 22px 0 10px;
+    padding-left: 10px;
+    border-left: 4px solid #C8A951;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #3A2F1E;
+    margin: 16px 0 7px;
+  }
+  p { margin-bottom: 9px; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 4px; }
+  strong { color: #3A2F1E; }
+  a { color: #C8A951; text-decoration: none; }
+
+  /* ===== TABLE OF CONTENTS ===== */
+  .toc-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #5D4E37;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #C8A951;
+  }
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 0;
+    border-bottom: 1px dotted #e5e7eb;
+  }
+  .toc-item .num {
+    font-weight: 700;
+    color: #C8A951;
+    min-width: 22px;
+    font-size: 10pt;
+  }
+  .toc-item .title {
+    flex: 1;
+    font-size: 10.5pt;
+    color: #374151;
+  }
+  .toc-item .dots {
+    flex: 1;
+    border-bottom: 1px dotted #ccc;
+    margin: 0 6px;
+    position: relative;
+    top: -3px;
+  }
+  .toc-item .page-num {
+    font-size: 9.5pt;
+    color: #999;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: right;
+  }
+  .toc-sub {
+    padding-left: 24px;
+  }
+  .toc-sub .title { font-size: 9.5pt; color: #6b7280; }
+  .toc-sub .num { font-size: 9.5pt; color: #9ca3af; }
+
+  /* ===== BOXES ===== */
+  .info-box {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-left: 4px solid #d97706;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 9.5pt;
+  }
+  .info-box.danger {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    border-left-color: #dc2626;
+  }
+  .info-box.success {
+    background: #f0fdf4;
+    border-color: #86efac;
+    border-left-color: #16a34a;
+  }
+  .info-box.info {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    border-left-color: #2563eb;
+  }
+  .info-box .box-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  /* ===== CODE BLOCKS ===== */
+  code {
+    font-family: 'Courier New', monospace;
+    background: #f3f4f6;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 9pt;
+    color: #374151;
+  }
+  .code-block {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: 'Courier New', monospace;
+    font-size: 8.8pt;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 10px 0;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  .code-block .comment { color: #6c7086; }
+  .code-block .cmd { color: #89b4fa; }
+  .code-block .str { color: #a6e3a1; }
+  .code-block .key { color: #cba6f7; }
+
+  /* ===== STEP NUMBERS ===== */
+  .step-list { margin: 10px 0; }
+  .step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+  .step-num {
+    min-width: 28px;
+    height: 28px;
+    background: #5D4E37;
+    color: #C8A951;
+    font-weight: 800;
+    font-size: 11pt;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-body strong { display: block; margin-bottom: 3px; color: #1e1e1e; }
+
+  /* ===== TABLE ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 9.5pt;
+  }
+  th {
+    background: #5D4E37;
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 700;
+  }
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ===== BADGE ===== */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 8pt;
+    font-weight: 700;
+  }
+  .badge-gold { background: #fef3c7; color: #92400e; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+
+  /* ===== SECTION INTRO ===== */
+  .section-intro {
+    font-size: 10pt;
+    color: #6b7280;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  /* ===== CHECK LIST ===== */
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li { padding: 4px 0 4px 26px; position: relative; }
+  .checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    body { background: #fff; font-size: 10pt; }
+    .page {
+      width: 100%;
+      margin: 0;
+      padding: 14mm 16mm 20mm 16mm;
+      box-shadow: none;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: avoid; }
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    h2, h3 { page-break-after: avoid; }
+    .no-break { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!--  PAGE 1 : COUVERTURE                                         -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-logo-box">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L20 8.5v7L12 19.82 4 15.5v-7l8-4.32zM12 6a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/>
+      </svg>
+    </div>
+    <div class="cover-badge">DGID · Bureau des Domaines · Tivaouane</div>
+    <h1>Guide de Déploiement<br>Gestion des Mutations</h1>
+    <h2>Installation sur Windows</h2>
+    <div class="cover-divider"></div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="label">Technologie</div>
+        <div class="value">Laravel 12 · PHP 8.2+</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Base de données</div>
+        <div class="value">SQLite</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Version doc</div>
+        <div class="value">Juin 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="label">Plateforme cible</div>
+        <div class="value">Windows 10 / 11</div>
+      </div>
+    </div>
+  </div>
+  <div class="cover-footer">
+    Document confidentiel · Direction Générale des Impôts et Domaines
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 2 : TABLE DES MATIÈRES                                 -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <div class="toc-title">Table des matières</div>
+
+  <div class="toc-item">
+    <span class="num">1.</span>
+    <span class="title">Prérequis logiciels</span>
+    <span class="dots"></span>
+    <span class="page-num">3</span>
+  </div>
+  <div class="toc-item toc-sub">
+    <span class="num">1.1</span>
+    <span class="title">PHP 8.2+</span>
+    <span class="dots"></span>
+    <span class="page-num">3</span>
+  </div>
+  <div class="toc-item toc-sub">
+    <span class="num">1.2</span>
+    <span class="title">Composer</span>
+    <span class="dots"></span>
+    <span class="page-num">3</span>
+  </div>
+  <div class="toc-item toc-sub">
+    <span class="num">1.3</span>
+    <span class="title">Node.js &amp; npm</span>
+    <span class="dots"></span>
+    <span class="page-num">3</span>
+  </div>
+  <div class="toc-item toc-sub">
+    <span class="num">1.4</span>
+    <span class="title">Git (optionnel)</span>
+    <span class="dots"></span>
+    <span class="page-num">3</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">2.</span>
+    <span class="title">Récupération du projet</span>
+    <span class="dots"></span>
+    <span class="page-num">4</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">3.</span>
+    <span class="title">Configuration de l'environnement</span>
+    <span class="dots"></span>
+    <span class="page-num">4</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">4.</span>
+    <span class="title">Installation des dépendances</span>
+    <span class="dots"></span>
+    <span class="page-num">5</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">5.</span>
+    <span class="title">Initialisation de la base de données</span>
+    <span class="dots"></span>
+    <span class="page-num">5</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">6.</span>
+    <span class="title">Compilation des assets frontend</span>
+    <span class="dots"></span>
+    <span class="page-num">6</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">7.</span>
+    <span class="title">Démarrage de l'application</span>
+    <span class="dots"></span>
+    <span class="page-num">6</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">8.</span>
+    <span class="title">Comptes utilisateurs par défaut</span>
+    <span class="dots"></span>
+    <span class="page-num">7</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">9.</span>
+    <span class="title">Extensions PHP requises</span>
+    <span class="dots"></span>
+    <span class="page-num">7</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">10.</span>
+    <span class="title">Structure du projet</span>
+    <span class="dots"></span>
+    <span class="page-num">8</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">11.</span>
+    <span class="title">Résolution des problèmes courants</span>
+    <span class="dots"></span>
+    <span class="page-num">9</span>
+  </div>
+  <div class="toc-item">
+    <span class="num">12.</span>
+    <span class="title">Récapitulatif rapide (Quick Start)</span>
+    <span class="dots"></span>
+    <span class="page-num">10</span>
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>2</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 3 : PRÉREQUIS                                          -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">1. Prérequis logiciels</h1>
+  <p class="section-intro">
+    Avant toute installation, vérifiez que les logiciels suivants sont présents sur la machine Windows cible.
+    Tous sont gratuits et disponibles publiquement.
+  </p>
+
+  <h2>1.1 PHP 8.2 ou supérieur</h2>
+  <p>
+    L'application nécessite <strong>PHP 8.2+</strong> avec plusieurs extensions activées.
+    La solution recommandée sur Windows est d'utiliser <strong>Laragon</strong>, qui embarque PHP, un serveur web Apache et SQLite en un seul installeur.
+  </p>
+  <div class="info-box success">
+    <div class="box-title">✓ Solution recommandée : Laragon</div>
+    Télécharger Laragon Full (inclut PHP 8.2, Apache, MySQL, SQLite) :<br>
+    <code>https://laragon.org/download/</code><br>
+    Choisir <strong>laragon-full.exe</strong> (version &gt; 6.0).
+  </div>
+  <div class="info-box">
+    <div class="box-title">⚡ Alternative : PHP standalone</div>
+    Télécharger PHP 8.2 Thread Safe depuis <code>https://windows.php.net/download/</code> et ajouter le dossier PHP au <strong>PATH Windows</strong>.
+  </div>
+
+  <h2>1.2 Composer (gestionnaire de paquets PHP)</h2>
+  <p>
+    Composer gère toutes les bibliothèques PHP du projet (Laravel, DomPDF, Excel, QR Code…).
+  </p>
+  <ul>
+    <li>Télécharger <strong>Composer-Setup.exe</strong> depuis <code>https://getcomposer.org/download/</code></li>
+    <li>Lors de l'installation, l'assistant détecte automatiquement le chemin vers <code>php.exe</code></li>
+    <li>Vérification : ouvrir un terminal et taper <code>composer --version</code></li>
+  </ul>
+
+  <h2>1.3 Node.js &amp; npm</h2>
+  <p>
+    Requis pour compiler les assets CSS/JS (Vite + Tailwind CSS). Version minimale : <strong>Node.js 18</strong>.
+  </p>
+  <ul>
+    <li>Télécharger l'installeur LTS depuis <code>https://nodejs.org/</code></li>
+    <li>npm est inclus avec Node.js</li>
+    <li>Vérification : <code>node --version</code> et <code>npm --version</code></li>
+  </ul>
+
+  <h2>1.4 Git (optionnel)</h2>
+  <p>
+    Git est recommandé pour cloner le projet depuis un dépôt. Si le projet est fourni en archive ZIP, Git n'est pas obligatoire.
+  </p>
+  <ul>
+    <li>Télécharger depuis <code>https://git-scm.com/download/win</code></li>
+  </ul>
+
+  <div class="info-box info no-break">
+    <div class="box-title">ℹ Résumé des versions minimales requises</div>
+    <table style="margin:6px 0;">
+      <thead><tr><th>Logiciel</th><th>Version minimale</th><th>Recommandé</th></tr></thead>
+      <tbody>
+        <tr><td>PHP</td><td>8.2</td><td>8.2.x ou 8.3.x</td></tr>
+        <tr><td>Composer</td><td>2.0</td><td>2.7+</td></tr>
+        <tr><td>Node.js</td><td>18.0</td><td>20 LTS</td></tr>
+        <tr><td>npm</td><td>9.0</td><td>10+</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>3</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 4 : RÉCUPÉRATION + CONFIGURATION                       -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">2. Récupération du projet</h1>
+  <p class="section-intro">
+    Le projet peut être obtenu via Git ou via une archive ZIP fournie par l'équipe.
+  </p>
+
+  <h2>Option A — Via Git (recommandé)</h2>
+  <div class="code-block">
+<span class="comment"># Ouvrir un terminal (cmd ou PowerShell) dans le dossier cible</span>
+<span class="comment"># Par exemple : C:\projets\</span>
+
+<span class="cmd">git clone</span> <span class="str">&lt;URL_DU_DEPOT&gt;</span> gestion-mutations
+<span class="cmd">cd</span> gestion-mutations
+  </div>
+
+  <h2>Option B — Via archive ZIP</h2>
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Extraire l'archive</strong>
+        Décompresser le fichier <code>gestion-mutations.zip</code> dans un dossier, par exemple <code>C:\projets\gestion-mutations\</code>.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Ouvrir un terminal dans ce dossier</strong>
+        Dans l'Explorateur Windows, naviguer vers le dossier extrait, puis <em>Maj + clic droit</em> → <em>Ouvrir PowerShell ici</em>.
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box danger no-break">
+    <div class="box-title">⚠ Important — Chemin sans espaces</div>
+    Éviter les chemins avec espaces ou caractères accentués (ex : <code>C:\Mes Documents\</code>).
+    Préférer <code>C:\projets\</code> ou <code>C:\www\</code> pour éviter des erreurs PHP/Composer.
+  </div>
+
+  <!-- ===================== -->
+  <h1 class="section-title" style="margin-top:24px;">3. Configuration de l'environnement</h1>
+  <p class="section-intro">
+    L'application utilise un fichier <code>.env</code> pour toutes les variables d'environnement (clé app, base de données, mail…).
+  </p>
+
+  <h2>3.1 Créer le fichier .env</h2>
+  <div class="code-block">
+<span class="comment"># Dans le dossier du projet :</span>
+<span class="cmd">copy</span> .env.example .env
+  </div>
+
+  <h2>3.2 Modifier les variables essentielles</h2>
+  <p>Ouvrir <code>.env</code> avec un éditeur de texte (Notepad++, VS Code) et ajuster :</p>
+
+  <div class="code-block">
+<span class="key">APP_NAME</span>=<span class="str">"Gestion des Mutations"</span>
+<span class="key">APP_ENV</span>=<span class="str">local</span>
+<span class="key">APP_DEBUG</span>=<span class="str">true</span>
+<span class="key">APP_URL</span>=<span class="str">http://localhost:8000</span>
+
+<span class="comment"># Base de données SQLite (aucune configuration serveur requise)</span>
+<span class="key">DB_CONNECTION</span>=<span class="str">sqlite</span>
+
+<span class="comment"># Pour la session et le cache :</span>
+<span class="key">SESSION_DRIVER</span>=<span class="str">database</span>
+<span class="key">CACHE_STORE</span>=<span class="str">database</span>
+<span class="key">QUEUE_CONNECTION</span>=<span class="str">database</span>
+  </div>
+
+  <div class="info-box">
+    <div class="box-title">📌 À propos de SQLite</div>
+    Le projet utilise <strong>SQLite</strong> par défaut — aucun serveur de base de données (MySQL, PostgreSQL) n'est requis.
+    Le fichier de base de données se crée automatiquement dans <code>database/database.sqlite</code>.
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>4</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 5 : DÉPENDANCES + BASE DE DONNÉES                      -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">4. Installation des dépendances</h1>
+  <p class="section-intro">
+    Toutes les bibliothèques PHP et Node.js doivent être installées avant de lancer l'application.
+  </p>
+
+  <h2>4.1 Dépendances PHP (Composer)</h2>
+  <p>Dans le terminal, depuis le dossier du projet :</p>
+  <div class="code-block">
+<span class="cmd">composer install</span>
+  </div>
+  <p>Cette commande télécharge automatiquement :</p>
+  <ul>
+    <li><strong>Laravel 12</strong> — framework principal</li>
+    <li><strong>barryvdh/laravel-dompdf</strong> — génération de PDF pour les notifications</li>
+    <li><strong>maatwebsite/excel</strong> — import/export des fichiers Excel</li>
+    <li><strong>simplesoftwareio/simple-qrcode</strong> — génération des QR codes de vérification</li>
+    <li><strong>spatie/laravel-permission</strong> — gestion des rôles (admin, receveur, gestionnaire, opérateur)</li>
+  </ul>
+
+  <div class="info-box">
+    <div class="box-title">⏱ Durée</div>
+    L'installation dure 2 à 5 minutes selon la vitesse de connexion.
+    Ne pas interrompre la commande.
+  </div>
+
+  <h2>4.2 Génération de la clé d'application</h2>
+  <div class="code-block">
+<span class="cmd">php artisan key:generate</span>
+  </div>
+  <p>Cette commande crée la clé <code>APP_KEY</code> dans le fichier <code>.env</code>.
+  Elle est indispensable pour le chiffrement des sessions.</p>
+
+  <!-- ===================== -->
+  <h1 class="section-title" style="margin-top:24px;">5. Initialisation de la base de données</h1>
+  <p class="section-intro">
+    La base de données doit être créée, les tables générées et les données de base insérées.
+  </p>
+
+  <h2>5.1 Créer le fichier SQLite</h2>
+  <div class="code-block">
+<span class="comment"># Créer le fichier SQLite vide (PowerShell)</span>
+<span class="cmd">New-Item</span> -Path database\database.sqlite -ItemType File
+
+<span class="comment"># Ou en cmd :</span>
+<span class="cmd">type nul</span> > database\database.sqlite
+  </div>
+
+  <h2>5.2 Exécuter les migrations</h2>
+  <p>Les migrations créent toutes les tables nécessaires (communes, projets, parcelles, proprietaires, mutations, imports, templates…) :</p>
+  <div class="code-block">
+<span class="cmd">php artisan migrate</span>
+  </div>
+
+  <h2>5.3 Insérer les données initiales</h2>
+  <div class="code-block">
+<span class="cmd">php artisan db:seed</span>
+  </div>
+  <p>Cette commande insère :</p>
+  <ul>
+    <li>Les <strong>rôles et permissions</strong> (admin, receveur, gestionnaire, opérateur)</li>
+    <li>Le <strong>template de document</strong> de notification d'attribution</li>
+    <li>Des <strong>données de test</strong> (communes, projets, parcelles, mutations d'exemple)</li>
+    <li>Les <strong>comptes utilisateurs</strong> de démonstration</li>
+  </ul>
+
+  <div class="info-box success no-break">
+    <div class="box-title">✓ Commande tout-en-un (migrations + seed)</div>
+    <div class="code-block" style="margin:6px 0;">
+<span class="cmd">php artisan migrate:fresh --seed</span>
+    </div>
+    Réinitialise complètement la base et insère les données de départ. Idéal pour un premier déploiement.
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>5</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 6 : ASSETS + DÉMARRAGE                                 -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">6. Compilation des assets frontend</h1>
+  <p class="section-intro">
+    Les fichiers CSS (Tailwind) et JS doivent être compilés avant que l'interface soit utilisable.
+  </p>
+
+  <h2>6.1 Installer les dépendances Node.js</h2>
+  <div class="code-block">
+<span class="cmd">npm install</span>
+  </div>
+
+  <h2>6.2 Compiler pour la production</h2>
+  <div class="code-block">
+<span class="cmd">npm run build</span>
+  </div>
+  <p>
+    Cette commande génère les fichiers optimisés dans <code>public/build/</code>.
+    À utiliser pour un déploiement stable.
+  </p>
+
+  <div class="info-box">
+    <div class="box-title">🔄 Mode développement (avec rechargement automatique)</div>
+    <div class="code-block" style="margin:6px 0 0;">
+<span class="cmd">npm run dev</span>
+    </div>
+    À utiliser uniquement en phase de développement. Laisser ce terminal ouvert en parallèle du serveur PHP.
+  </div>
+
+  <h2>6.3 Permissions du dossier storage</h2>
+  <p>Sur Windows, s'assurer que le dossier <code>storage\</code> est accessible en écriture par PHP :</p>
+  <div class="code-block">
+<span class="cmd">php artisan storage:link</span>
+  </div>
+  <p>Crée le lien symbolique <code>public/storage</code> → <code>storage/app/public</code>.</p>
+
+  <!-- ===================== -->
+  <h1 class="section-title" style="margin-top:24px;">7. Démarrage de l'application</h1>
+  <p class="section-intro">
+    Deux modes de démarrage sont disponibles selon l'usage.
+  </p>
+
+  <h2>Mode simple — Serveur intégré PHP</h2>
+  <p>Pour un usage local sans configuration serveur web :</p>
+  <div class="code-block">
+<span class="cmd">php artisan serve</span>
+  </div>
+  <p>L'application est accessible sur : <strong>http://localhost:8000</strong></p>
+
+  <div class="info-box success">
+    <div class="box-title">✓ URL d'accès</div>
+    Ouvrir un navigateur (Chrome, Edge) et aller sur : <strong>http://127.0.0.1:8000</strong>
+  </div>
+
+  <h2>Mode complet — Tout en une commande</h2>
+  <p>Lance simultanément le serveur PHP, la queue, les logs et Vite :</p>
+  <div class="code-block">
+<span class="cmd">composer run dev</span>
+  </div>
+  <p>Ce mode est recommandé pour le développement actif. Nécessite que <code>concurrently</code> soit installé (inclus dans <code>npm install</code>).</p>
+
+  <div class="info-box danger no-break">
+    <div class="box-title">⚠ Ne pas fermer le terminal</div>
+    Le serveur PHP s'arrête si le terminal est fermé.
+    Pour un usage permanent, configurer Laragon pour servir l'application (voir section 11).
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>6</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 7 : COMPTES + EXTENSIONS                               -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">8. Comptes utilisateurs par défaut</h1>
+  <p class="section-intro">
+    Après le <code>db:seed</code>, les comptes suivants sont disponibles. Le mot de passe initial est <strong>password</strong> pour tous.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nom</th>
+        <th>Rôle</th>
+        <th>Accès</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>admin@domaines.sn</code></td>
+        <td>Administrateur</td>
+        <td><span class="badge badge-red">admin</span></td>
+        <td>Accès total — gestion utilisateurs, templates, export</td>
+      </tr>
+      <tr>
+        <td><code>receveur@domaines.sn</code></td>
+        <td>Mamadou DIALLO</td>
+        <td><span class="badge badge-gold">receveur</span></td>
+        <td>Validation mutations, rapports, PDF</td>
+      </tr>
+      <tr>
+        <td><code>gestionnaire@domaines.sn</code></td>
+        <td>Abdoulaye NDIAYE</td>
+        <td><span class="badge badge-blue">gestionnaire</span></td>
+        <td>Imports, gestion parcelles et mutations</td>
+      </tr>
+      <tr>
+        <td><code>operateur@domaines.sn</code></td>
+        <td>Fatou SARR</td>
+        <td><span class="badge badge-green">opérateur</span></td>
+        <td>Saisie et consultation uniquement</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box danger">
+    <div class="box-title">⚠ Sécurité — Production</div>
+    Changer impérativement les mots de passe avant toute utilisation en production.
+    Désactiver le compte admin de test après création d'un vrai compte administrateur.
+  </div>
+
+  <!-- ===================== -->
+  <h1 class="section-title" style="margin-top:24px;">9. Extensions PHP requises</h1>
+  <p class="section-intro">
+    Vérifier que les extensions suivantes sont activées dans le fichier <code>php.ini</code>.
+    Avec Laragon, la plupart sont déjà activées.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Extension</th><th>Usage</th><th>Statut Laragon</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>pdo_sqlite</code></td><td>Base de données SQLite</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>sqlite3</code></td><td>Support SQLite natif</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>gd</code></td><td>Génération des QR codes (images PNG)</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>mbstring</code></td><td>Gestion des chaînes multi-octets (accents)</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>openssl</code></td><td>Chiffrement, sessions sécurisées</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>fileinfo</code></td><td>Détection du type MIME des fichiers uploadés</td><td><span class="badge badge-green">Activée</span></td></tr>
+      <tr><td><code>zip</code></td><td>Import/export Excel (maatwebsite)</td><td><span class="badge badge-gold">Vérifier</span></td></tr>
+      <tr><td><code>xml</code></td><td>Traitement des fichiers Excel (format OOXML)</td><td><span class="badge badge-gold">Vérifier</span></td></tr>
+      <tr><td><code>intl</code></td><td>Formatage des dates en français</td><td><span class="badge badge-gold">Vérifier</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Activer une extension dans php.ini</h2>
+  <p>Localiser le fichier <code>php.ini</code> (souvent dans <code>C:\laragon\bin\php\php-8.2.x\php.ini</code>) et décommenter la ligne correspondante :</p>
+  <div class="code-block">
+<span class="comment"># Avant (commenté) :</span>
+;extension=gd
+
+<span class="comment"># Après (activé) :</span>
+<span class="str">extension=gd</span>
+  </div>
+  <p>Redémarrer le serveur PHP après toute modification de <code>php.ini</code>.</p>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>7</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 8 : STRUCTURE DU PROJET                                -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">10. Structure du projet</h1>
+  <p class="section-intro">
+    Description des dossiers et fichiers importants à connaître pour l'administration et la personnalisation.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Chemin</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>app/Http/Controllers/</code></td><td>Contrôleurs (logique métier : mutations, imports, rapports…)</td></tr>
+      <tr><td><code>app/Models/</code></td><td>Modèles Eloquent (Mutation, Parcelle, Proprietaire, Import…)</td></tr>
+      <tr><td><code>database/migrations/</code></td><td>Structure des tables de la base de données</td></tr>
+      <tr><td><code>database/seeders/</code></td><td>Données initiales (rôles, template, données de test)</td></tr>
+      <tr><td><code>database/database.sqlite</code></td><td>Fichier de base de données SQLite</td></tr>
+      <tr><td><code>resources/views/</code></td><td>Templates Blade (interface HTML de l'application)</td></tr>
+      <tr><td><code>public/images/</code></td><td>Images statiques : logo DGID, en-tête des documents PDF</td></tr>
+      <tr><td><code>public/build/</code></td><td>Assets compilés (CSS/JS) — généré par <code>npm run build</code></td></tr>
+      <tr><td><code>storage/app/</code></td><td>Fichiers générés (QR codes temporaires, exports)</td></tr>
+      <tr><td><code>storage/logs/</code></td><td>Journaux de l'application (<code>laravel.log</code>)</td></tr>
+      <tr><td><code>.env</code></td><td>Configuration locale (clés, base de données, mail)</td></tr>
+      <tr><td><code>routes/web.php</code></td><td>Définition de toutes les routes HTTP</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Modules fonctionnels</h2>
+  <table>
+    <thead>
+      <tr><th>Module</th><th>Description</th><th>URL</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Tableau de bord</td><td>Statistiques globales et dernières mutations</td><td><code>/dashboard</code></td></tr>
+      <tr><td>Mutations</td><td>Liste, création, validation et PDF des mutations</td><td><code>/mutations</code></td></tr>
+      <tr><td>Imports Excel</td><td>Import en masse via fichier Excel</td><td><code>/imports</code></td></tr>
+      <tr><td>Parcelles</td><td>Consultation et gestion des lots</td><td><code>/parcelles</code></td></tr>
+      <tr><td>Projets</td><td>Gestion des lotissements par commune</td><td><code>/projets</code></td></tr>
+      <tr><td>Rapports</td><td>Rapports filtrés exportables en PDF</td><td><code>/rapports</code></td></tr>
+      <tr><td>Vérification QR</td><td>Scan et vérification des documents</td><td><code>/scanner</code></td></tr>
+      <tr><td>Templates</td><td>Éditeur de modèle de notification (HTML)</td><td><code>/templates</code></td></tr>
+      <tr><td>Annulations</td><td>Demandes et approbations d'annulation</td><td><code>/annulations</code></td></tr>
+      <tr><td>Administration</td><td>Export/import de la base de données</td><td><code>/admin/export-import</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Images personnalisables</h2>
+  <p>
+    Le dossier <code>public/images/</code> contient les images utilisées dans les documents PDF générés.
+    Pour personnaliser l'en-tête des notifications :
+  </p>
+  <ul>
+    <li>Remplacer <code>public/images/entete_dgid.png</code> par l'en-tête officiel souhaité</li>
+    <li>Maintenir les mêmes dimensions (largeur ~800px recommandée)</li>
+    <li>Le logo <code>public/images/dgid-logo.png</code> est utilisé dans la barre latérale</li>
+  </ul>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>8</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 9 : RÉSOLUTION DES PROBLÈMES                           -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">11. Résolution des problèmes courants</h1>
+  <p class="section-intro">
+    Liste des erreurs fréquentes rencontrées lors du déploiement sur Windows et leur solution.
+  </p>
+
+  <h2>Erreur : <code>Could not open input file: artisan</code></h2>
+  <p>Le terminal n'est pas dans le bon dossier. Vérifier avec :</p>
+  <div class="code-block">
+<span class="cmd">dir artisan</span>   <span class="comment"># doit afficher le fichier artisan</span>
+  </div>
+  <p>Naviguer dans le dossier du projet : <code>cd C:\projets\gestion-mutations</code></p>
+
+  <h2>Erreur : <code>Class "PDO" not found</code> ou <code>pdo_sqlite</code></h2>
+  <p>L'extension PDO SQLite n'est pas activée. Dans <code>php.ini</code>, décommenter :</p>
+  <div class="code-block">
+<span class="str">extension=pdo_sqlite</span>
+<span class="str">extension=sqlite3</span>
+  </div>
+
+  <h2>Erreur : <code>The stream or file ... could not be opened</code></h2>
+  <p>Le dossier <code>storage\</code> n'est pas accessible en écriture. Dans PowerShell en admin :</p>
+  <div class="code-block">
+<span class="cmd">icacls</span> storage /grant Users:F /T
+<span class="cmd">icacls</span> bootstrap\cache /grant Users:F /T
+  </div>
+
+  <h2>Erreur : <code>Vite manifest not found</code></h2>
+  <p>Les assets n'ont pas été compilés. Exécuter :</p>
+  <div class="code-block">
+<span class="cmd">npm install</span>
+<span class="cmd">npm run build</span>
+  </div>
+
+  <h2>Erreur : <code>php_gd2.dll — module not found</code></h2>
+  <p>L'extension GD est requise pour les QR codes. Activer dans <code>php.ini</code> :</p>
+  <div class="code-block">
+<span class="str">extension=gd</span>
+  </div>
+
+  <h2>Erreur : <code>No application encryption key</code></h2>
+  <p>La clé d'application n'a pas été générée :</p>
+  <div class="code-block">
+<span class="cmd">php artisan key:generate</span>
+  </div>
+
+  <h2>Page blanche ou erreur 500</h2>
+  <p>Consulter le fichier de log pour connaître la cause exacte :</p>
+  <div class="code-block">
+<span class="comment"># Afficher les dernières erreurs :</span>
+<span class="cmd">type</span> storage\logs\laravel.log | <span class="cmd">more</span>
+  </div>
+  <p>Vérifier aussi que <code>APP_DEBUG=true</code> est bien défini dans <code>.env</code> pour afficher le détail de l'erreur dans le navigateur.</p>
+
+  <h2>La session expire immédiatement</h2>
+  <p>La table de sessions n'a pas été créée. Vérifier :</p>
+  <div class="code-block">
+<span class="cmd">php artisan migrate</span>
+<span class="cmd">php artisan cache:clear</span>
+<span class="cmd">php artisan config:clear</span>
+  </div>
+
+  <h2>Caractères accentués incorrects dans les PDF</h2>
+  <p>L'extension <code>intl</code> est nécessaire pour le formatage des dates en français. Activer dans <code>php.ini</code> :</p>
+  <div class="code-block">
+<span class="str">extension=intl</span>
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>9</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  PAGE 10 : QUICK START                                       -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="page-header">
+    <span class="app-name">GESTION DES MUTATIONS</span>
+    <span class="doc-title">Guide de Déploiement Windows</span>
+  </div>
+
+  <h1 class="section-title">12. Récapitulatif rapide (Quick Start)</h1>
+  <p class="section-intro">
+    Toutes les commandes d'installation dans l'ordre, à copier-coller dans un terminal PowerShell
+    ouvert dans le dossier du projet.
+  </p>
+
+  <div class="code-block">
+<span class="comment"># ── 1. Prérequis (à installer manuellement, une seule fois) ──────────
+# Laragon : https://laragon.org/download/
+# Node.js  : https://nodejs.org/
+# ─────────────────────────────────────────────────────────────────────</span>
+
+<span class="comment"># ── 2. Récupérer le projet ────────────────────────────────────────────</span>
+<span class="cmd">git clone</span> <span class="str">&lt;URL_DU_DEPOT&gt;</span> gestion-mutations
+<span class="cmd">cd</span> gestion-mutations
+
+<span class="comment"># ── 3. Fichier d'environnement ────────────────────────────────────────</span>
+<span class="cmd">copy</span> .env.example .env
+
+<span class="comment"># ── 4. Dépendances PHP ────────────────────────────────────────────────</span>
+<span class="cmd">composer install</span>
+
+<span class="comment"># ── 5. Clé d'application ─────────────────────────────────────────────</span>
+<span class="cmd">php artisan key:generate</span>
+
+<span class="comment"># ── 6. Base de données SQLite ─────────────────────────────────────────</span>
+<span class="cmd">New-Item</span> -Path database\database.sqlite -ItemType File
+<span class="cmd">php artisan migrate:fresh --seed</span>
+
+<span class="comment"># ── 7. Dépendances Node.js + compilation CSS/JS ───────────────────────</span>
+<span class="cmd">npm install</span>
+<span class="cmd">npm run build</span>
+
+<span class="comment"># ── 8. Lien symbolique storage ────────────────────────────────────────</span>
+<span class="cmd">php artisan storage:link</span>
+
+<span class="comment"># ── 9. Démarrer le serveur ────────────────────────────────────────────</span>
+<span class="cmd">php artisan serve</span>
+
+<span class="comment"># ── 10. Ouvrir dans le navigateur ─────────────────────────────────────
+#  → http://localhost:8000
+#  → admin@domaines.sn / password</span>
+  </div>
+
+  <div class="info-box success" style="margin-top:18px;">
+    <div class="box-title">✓ Durée totale estimée</div>
+    <ul style="margin-top:6px;">
+      <li>Installation Laragon + Node.js : <strong>~10 min</strong></li>
+      <li>Installation du projet (composer + npm) : <strong>~5 min</strong></li>
+      <li>Configuration et démarrage : <strong>~2 min</strong></li>
+    </ul>
+    Durée totale : environ <strong>15 à 20 minutes</strong> sur une nouvelle machine.
+  </div>
+
+  <h2>Commandes utiles en cours d'utilisation</h2>
+  <table>
+    <thead><tr><th>Commande</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>php artisan migrate</code></td><td>Appliquer les nouvelles migrations après une mise à jour</td></tr>
+      <tr><td><code>php artisan db:seed --class=DocumentTemplateSeeder</code></td><td>Réinitialiser le template de notification</td></tr>
+      <tr><td><code>php artisan cache:clear</code></td><td>Vider le cache de configuration</td></tr>
+      <tr><td><code>php artisan config:clear</code></td><td>Vider le cache des fichiers de config</td></tr>
+      <tr><td><code>php artisan route:list</code></td><td>Lister toutes les routes disponibles</td></tr>
+      <tr><td><code>php artisan tinker</code></td><td>Console interactive Laravel (debug avancé)</td></tr>
+      <tr><td><code>npm run build</code></td><td>Recompiler les assets après modification CSS/JS</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box info" style="margin-top:16px;">
+    <div class="box-title">📧 Support technique</div>
+    En cas de problème non résolu par ce guide, consulter le fichier <code>storage/logs/laravel.log</code>
+    et transmettre les dernières lignes d'erreur au responsable technique du projet.
+  </div>
+
+  <div class="page-footer">
+    <span>DGID · Gestion des Mutations</span>
+    <span>10</span>
+    <span>Juin 2026</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  BOUTON IMPRIMER (masqué à l'impression)                     -->
+<!-- ============================================================ -->
+<div style="text-align:center; margin:20px 0; padding:20px;">
+  <button onclick="window.print()" style="
+    background: linear-gradient(135deg, #5D4E37, #3A2F1E);
+    color: #C8A951; border: none; padding: 14px 36px;
+    border-radius: 10px; font-size: 14pt; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(93,78,55,0.3);
+  ">
+    🖨 Exporter en PDF (Ctrl+P → Enregistrer en PDF)
+  </button>
+  <p style="margin-top:12px; color:#999; font-size:10pt;">
+    Dans la boîte de dialogue d'impression : Destination → <strong>Enregistrer au format PDF</strong>
+    · Format → <strong>A4</strong> · Marges → <strong>Aucune</strong>
+  </p>
+</div>
+
+<style>
+  @media print {
+    div[style*="text-align:center; margin:20px"] { display: none !important; }
+  }
+</style>
+
+</body>
+</html>
