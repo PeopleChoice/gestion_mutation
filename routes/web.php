@@ -11,8 +11,14 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\ExportImportController;
 use App\Http\Controllers\RechercheController;
+use App\Http\Controllers\SetupController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
+
+// Assistant de configuration (application de bureau / premier lancement)
+Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
+Route::post('/setup/test', [SetupController::class, 'test'])->name('setup.test');
+Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
 
 // Auth
 Route::get('/', fn () => redirect('/login'));
