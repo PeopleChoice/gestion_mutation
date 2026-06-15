@@ -144,8 +144,13 @@ Variantes de colonnes accentuées/non. Imports globaux : projet résolu par colo
 | Notification + QR (impression) | ✅ | ✅ |
 | Document templates | ✅ | ✅ |
 | Annulations (demande/traitement) | ✅ | ✅ |
-| Imports Excel (parsing/matching) | ⏳ TODO | ⏳ TODO |
+| Imports Excel (upload/parsing/matching/validation) | ✅ | ✅ |
 | Rapports / Export-Import BDD | ⏳ TODO | ⏳ TODO |
+
+> Imports : upload `.xlsx` (multipart), détection auto de la ligne d'en-tête
+> (la plus remplie des 3 premières), matching `numero_lot + projet_id`, puis
+> validation/refus ligne à ligne (la validation crée une mutation validée + code).
+> Templates Excel téléchargeables et imports globaux multi-projets restent à faire.
 
 > La notification est rendue en **HTML + QR (data URI PNG)** côté backend, puis
 > imprimée via le navigateur (Imprimer → Enregistrer en PDF). Le code QR encode

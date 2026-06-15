@@ -11,6 +11,7 @@ const allNav = [
   { name: 'dashboard', label: 'Tableau de bord', icon: '▦' },
   { name: 'projets', label: 'Projets', icon: '▣' },
   { name: 'parcelles', label: 'Parcelles', icon: '▤' },
+  { name: 'imports', label: 'Imports', icon: '⇪' },
   { name: 'mutations', label: 'Mutations', icon: '⇄' },
   { name: 'annulations', label: 'Annulations', icon: '⊘', roles: ['admin', 'gestionnaire'] },
   { name: 'communes', label: 'Communes', icon: '◉' },

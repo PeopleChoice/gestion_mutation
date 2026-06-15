@@ -2,6 +2,7 @@ pub mod annulations;
 pub mod auth;
 pub mod communes;
 pub mod dashboard;
+pub mod imports;
 pub mod mutations;
 pub mod parcelles;
 pub mod projets;

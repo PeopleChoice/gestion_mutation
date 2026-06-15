@@ -8,6 +8,7 @@ mod seed;
 mod state;
 mod util;
 
+use axum::extract::DefaultBodyLimit;
 use axum::routing::{delete, get, post, put};
 use axum::Router;
 use config::AppConfig;
@@ -80,6 +81,11 @@ async fn main() -> anyhow::Result<()> {
         .route("/templates", get(handlers::templates::list).post(handlers::templates::store))
         .route("/templates/:id", get(handlers::templates::show).put(handlers::templates::update).delete(handlers::templates::destroy))
         .route("/templates/:id/toggle", post(handlers::templates::toggle))
+        // Imports Excel
+        .route("/imports", get(handlers::imports::list).post(handlers::imports::upload))
+        .route("/imports/:id", get(handlers::imports::show))
+        .route("/imports/lignes/:id/valider", post(handlers::imports::valider_ligne))
+        .route("/imports/lignes/:id/refuser", post(handlers::imports::refuser_ligne))
         // Recherche
         .route("/recherche/rapide", get(handlers::recherche::rapide))
         // Vérification publique
@@ -96,7 +102,10 @@ async fn main() -> anyhow::Result<()> {
         );
     }
 
-    let app = app.layer(cors).with_state(state);
+    let app = app
+        .layer(DefaultBodyLimit::max(25 * 1024 * 1024)) // 25 Mo (uploads Excel)
+        .layer(cors)
+        .with_state(state);
 
     let port: u16 = std::env::var("GM_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8788);
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
