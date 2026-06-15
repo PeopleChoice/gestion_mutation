@@ -109,12 +109,14 @@ applicative décodée (format `base64:`). Voir `util::code_verification` et
 
 Implémenté (backend + frontend) : **setup, auth/RBAC, dashboard, communes,
 projets, parcelles (+ attribution), mutations (+ validation/refus + code de
-vérification), recherche, vérification publique**.
+vérification), recherche, vérification publique, notification imprimable + QR,
+modèles de documents, annulations (demande/traitement)**.
 
 À compléter (cf. [SPEC.md](SPEC.md) §État d'avancement) :
 - **Imports Excel** (parsing + matching) → crate `calamine`.
-- **PDF de notification + QR code** → crate `qrcode` + moteur HTML→PDF.
-- **Document templates** (placeholders), **annulations**, **rapports**,
-  **export/import BDD**, gestion des **utilisateurs**.
+- **Rapports**, **export/import BDD**, gestion des **utilisateurs**.
 
 Ces modules suivent exactement les règles décrites dans `SPEC.md`.
+
+La **notification** est produite en HTML + QR (PNG data URI) par le backend puis
+imprimée depuis le navigateur (Imprimer → Enregistrer en PDF).

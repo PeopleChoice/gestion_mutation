@@ -28,6 +28,26 @@ async function refuser(m) {
   catch (e) { error.value = errMessage(e) }
 }
 
+async function imprimer(m) {
+  error.value = null
+  try {
+    const { data } = await api.get(`/mutations/${m.id}/notification`)
+    const w = window.open('', '_blank')
+    w.document.write(`<!DOCTYPE html><html><head><title>Notification ${m.numero_notification}</title>
+      <style>body{font-family:Georgia,serif;max-width:800px;margin:24px auto;padding:0 24px;color:#111}</style></head>
+      <body>${data.html}<script>window.onload=()=>window.print()<\/script></body></html>`)
+    w.document.close()
+  } catch (e) { error.value = errMessage(e) }
+}
+
+async function demanderAnnulation(m) {
+  const motif = prompt("Motif de la demande d'annulation ?")
+  if (!motif) return
+  error.value = null
+  try { await api.post(`/mutations/${m.id}/annulation`, { motif }); alert('Demande envoyée.') }
+  catch (e) { error.value = errMessage(e) }
+}
+
 const badge = (s) => ({
   validee: 'bg-green-100 text-green-700', en_attente: 'bg-amber-100 text-amber-700',
   refusee: 'bg-red-100 text-red-700', annulee: 'bg-slate-200 text-slate-600',
@@ -75,7 +95,11 @@ onMounted(load)
           <td class="p-3 text-right whitespace-nowrap">
             <template v-if="m.statut==='en_attente' && auth.hasRole('admin')">
               <button @click="valider(m)" class="text-green-600 mr-3">Valider</button>
-              <button @click="refuser(m)" class="text-red-600">Refuser</button>
+              <button @click="refuser(m)" class="text-red-600 mr-3">Refuser</button>
+            </template>
+            <template v-if="m.statut==='validee'">
+              <button @click="imprimer(m)" class="text-blue-600 mr-3">Notification</button>
+              <button @click="demanderAnnulation(m)" class="text-amber-600">Annuler</button>
             </template>
           </td>
         </tr>

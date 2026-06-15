@@ -5,14 +5,19 @@ import { useRouter } from 'vue-router'
 const auth = useAuth()
 const router = useRouter()
 
-const nav = [
+import { computed } from 'vue'
+
+const allNav = [
   { name: 'dashboard', label: 'Tableau de bord', icon: '▦' },
   { name: 'projets', label: 'Projets', icon: '▣' },
   { name: 'parcelles', label: 'Parcelles', icon: '▤' },
   { name: 'mutations', label: 'Mutations', icon: '⇄' },
+  { name: 'annulations', label: 'Annulations', icon: '⊘', roles: ['admin', 'gestionnaire'] },
   { name: 'communes', label: 'Communes', icon: '◉' },
+  { name: 'templates', label: 'Modèles', icon: '▥', roles: ['admin'] },
   { name: 'recherche', label: 'Recherche', icon: '🔍' },
 ]
+const nav = computed(() => allNav.filter((i) => !i.roles || auth.hasAny(i.roles)))
 
 function logout() {
   auth.logout()

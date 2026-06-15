@@ -25,6 +25,11 @@ hmac = "0.12"
 sha2 = "0.10"
 hex = "0.4"
 base64 = "0.22"
+# QR code (notification) rendu en PNG -> data URI
+# default-features = false : on n'utilise QUE le cœur (matrice), le PNG est
+# encodé via `image` pour éviter un conflit de version d'`image`.
+qrcode = { version = "0.14", default-features = false }
+image = { version = "0.25", default-features = false, features = ["png"] }
 # Divers
 chrono = { version = "0.4", features = ["serde"] }
 anyhow = "1"

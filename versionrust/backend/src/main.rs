@@ -71,6 +71,15 @@ async fn main() -> anyhow::Result<()> {
         .route("/mutations/:id", get(handlers::mutations::show))
         .route("/mutations/:id/valider", post(handlers::mutations::valider))
         .route("/mutations/:id/refuser", post(handlers::mutations::refuser))
+        .route("/mutations/:id/notification", get(handlers::mutations::notification))
+        .route("/mutations/:id/annulation", post(handlers::annulations::demander))
+        // Annulations
+        .route("/annulations", get(handlers::annulations::list))
+        .route("/annulations/:id/traiter", post(handlers::annulations::traiter))
+        // Templates de documents (admin)
+        .route("/templates", get(handlers::templates::list).post(handlers::templates::store))
+        .route("/templates/:id", get(handlers::templates::show).put(handlers::templates::update).delete(handlers::templates::destroy))
+        .route("/templates/:id/toggle", post(handlers::templates::toggle))
         // Recherche
         .route("/recherche/rapide", get(handlers::recherche::rapide))
         // Vérification publique

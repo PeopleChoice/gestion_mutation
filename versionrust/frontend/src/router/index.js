@@ -13,6 +13,8 @@ const routes = [
   { path: '/projets/:id', name: 'projet-detail', component: () => import('../views/ProjetDetail.vue') },
   { path: '/parcelles', name: 'parcelles', component: () => import('../views/Parcelles.vue') },
   { path: '/mutations', name: 'mutations', component: () => import('../views/Mutations.vue') },
+  { path: '/annulations', name: 'annulations', component: () => import('../views/Annulations.vue') },
+  { path: '/templates', name: 'templates', component: () => import('../views/Templates.vue') },
   { path: '/recherche', name: 'recherche', component: () => import('../views/Recherche.vue') },
 
   { path: '/:pathMatch(.*)*', name: 'notfound', component: () => import('../views/NotFound.vue'), meta: { public: true } },

@@ -224,6 +224,89 @@ pub async fn valider(
     Ok(Json(json!({ "ok": true, "code_verification": code })))
 }
 
+/// GET /api/mutations/:id/notification — HTML imprimable (avec QR) de la notification.
+pub async fn notification(
+    _user: AuthUser,
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+) -> AppResult<Json<Value>> {
+    let pool = state.db().await?;
+
+    let row = sqlx::query(
+        "SELECT m.numero_notification, m.date_mutation, m.code_verification, \
+                pa.numero_lot, pj.nom AS projet_nom, c.nom AS commune_nom, \
+                no.civilite, no.prenom, no.nom, no.cni_passport \
+         FROM mutations m \
+         JOIN parcelles pa ON pa.id = m.parcelle_id \
+         LEFT JOIN projets pj ON pj.id = pa.projet_id \
+         LEFT JOIN communes c ON c.id = pj.commune_id \
+         LEFT JOIN proprietaires no ON no.id = m.nouveau_proprietaire_id \
+         WHERE m.id = ?",
+    )
+    .bind(id)
+    .fetch_optional(&pool)
+    .await?
+    .ok_or_else(|| AppError::NotFound("Mutation introuvable.".into()))?;
+
+    let g = |k: &str| row.try_get::<Option<String>, _>(k).unwrap_or(None).unwrap_or_default();
+    let code = g("code_verification");
+    if code.is_empty() {
+        return Err(AppError::BadRequest("Cette mutation n'est pas validée (pas de code).".into()));
+    }
+
+    // Template actif
+    let tpl = sqlx::query(
+        "SELECT entete_html, corps_html, pied_html, centre_fiscal, bureau \
+         FROM document_templates WHERE type='notification_attribution' AND actif=1 \
+         ORDER BY id LIMIT 1",
+    )
+    .fetch_optional(&pool)
+    .await
+    .ok()
+    .flatten();
+
+    let (entete, corps, pied, centre, bureau) = match &tpl {
+        Some(t) => (
+            t.try_get::<Option<String>, _>("entete_html").unwrap_or(None).unwrap_or_default(),
+            t.try_get::<Option<String>, _>("corps_html").unwrap_or(None).unwrap_or_default(),
+            t.try_get::<Option<String>, _>("pied_html").unwrap_or(None).unwrap_or_default(),
+            t.try_get::<Option<String>, _>("centre_fiscal").unwrap_or(None).unwrap_or_default(),
+            t.try_get::<Option<String>, _>("bureau").unwrap_or(None).unwrap_or_default(),
+        ),
+        None => (String::new(), "<p>{{nom_complet_nouveau}} — lot {{numero_lot}}</p>".into(), String::new(), String::new(), String::new()),
+    };
+
+    // nom complet (Société -> prénom seul)
+    let civilite = g("civilite");
+    let nom_complet = if civilite == "Société" {
+        g("prenom")
+    } else {
+        format!("{} {} {}", civilite, g("prenom"), g("nom")).trim().to_string()
+    };
+
+    let qr = util::qr_data_uri(&util::verification_url(&code))?;
+
+    let mut html = format!("{entete}{corps}{pied}");
+    let repl: [(&str, String); 10] = [
+        ("{{numero_notification}}", g("numero_notification")),
+        ("{{date_mutation}}", g("date_mutation")),
+        ("{{numero_lot}}", g("numero_lot")),
+        ("{{nom_projet}}", g("projet_nom")),
+        ("{{commune}}", g("commune_nom")),
+        ("{{nom_complet_nouveau}}", nom_complet),
+        ("{{cni_nouveau}}", g("cni_passport")),
+        ("{{centre_fiscal}}", centre),
+        ("{{bureau}}", bureau),
+        ("{{code_verification}}", code.clone()),
+    ];
+    for (k, v) in repl {
+        html = html.replace(k, &v);
+    }
+    html = html.replace("{{qr_code}}", &qr);
+
+    Ok(Json(json!({ "html": html, "code_verification": code })))
+}
+
 #[derive(Debug, Deserialize)]
 pub struct RefusInput {
     pub motif_refus: String,

@@ -141,6 +141,51 @@ pub async fn next_code_projet(pool: &AnyPool, nom: &str) -> AppResult<String> {
     }
 }
 
+/// Génère un QR code à partir d'une donnée et le renvoie en data URI PNG.
+/// On lit la matrice via `qrcode` puis on dessine/encode le PNG avec `image`.
+pub fn qr_data_uri(data: &str) -> AppResult<String> {
+    use base64::Engine;
+    use image::{ImageFormat, Luma};
+    use qrcode::{Color, QrCode};
+
+    let code = QrCode::new(data.as_bytes())
+        .map_err(|e| AppError::Internal(format!("QR : {e}")))?;
+    let width = code.width();
+    let colors = code.to_colors();
+
+    let scale: u32 = 6;
+    let quiet: u32 = 4; // marge silencieuse (modules)
+    let size = (width as u32 + 2 * quiet) * scale;
+
+    let mut img = image::GrayImage::from_pixel(size, size, Luma([255u8]));
+    for y in 0..width {
+        for x in 0..width {
+            if colors[y * width + x] == Color::Dark {
+                let ox = (x as u32 + quiet) * scale;
+                let oy = (y as u32 + quiet) * scale;
+                for dy in 0..scale {
+                    for dx in 0..scale {
+                        img.put_pixel(ox + dx, oy + dy, Luma([0u8]));
+                    }
+                }
+            }
+        }
+    }
+
+    let mut buf = std::io::Cursor::new(Vec::new());
+    img.write_to(&mut buf, ImageFormat::Png)
+        .map_err(|e| AppError::Internal(format!("PNG : {e}")))?;
+
+    let b64 = base64::engine::general_purpose::STANDARD.encode(buf.into_inner());
+    Ok(format!("data:image/png;base64,{b64}"))
+}
+
+/// URL publique de vérification d'un code (configurable via GM_PUBLIC_URL).
+pub fn verification_url(code: &str) -> String {
+    let base = std::env::var("GM_PUBLIC_URL").unwrap_or_else(|_| "http://127.0.0.1:8788".into());
+    format!("{}/verification/{}", base.trim_end_matches('/'), code)
+}
+
 /// Journalise une action (équivalent `ActivityLog::log`).
 pub async fn log_activity(
     pool: &AnyPool,

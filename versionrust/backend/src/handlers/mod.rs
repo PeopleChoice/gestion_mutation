@@ -1,3 +1,4 @@
+pub mod annulations;
 pub mod auth;
 pub mod communes;
 pub mod dashboard;
@@ -6,4 +7,5 @@ pub mod parcelles;
 pub mod projets;
 pub mod recherche;
 pub mod setup;
+pub mod templates;
 pub mod verification;

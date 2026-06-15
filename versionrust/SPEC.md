@@ -141,10 +141,14 @@ Variantes de colonnes accentuées/non. Imports globaux : projet résolu par colo
 | Mutations (CRUD + code vérif + valider/refuser) | ✅ | ✅ |
 | Vérification publique (HMAC) | ✅ | ✅ |
 | Recherche globale | ✅ | ✅ |
+| Notification + QR (impression) | ✅ | ✅ |
+| Document templates | ✅ | ✅ |
+| Annulations (demande/traitement) | ✅ | ✅ |
 | Imports Excel (parsing/matching) | ⏳ TODO | ⏳ TODO |
-| PDF + QR (notification) | ⏳ TODO | ⏳ TODO |
-| Document templates | ⏳ TODO | ⏳ TODO |
-| Annulations | ⏳ TODO | ⏳ TODO |
 | Rapports / Export-Import BDD | ⏳ TODO | ⏳ TODO |
+
+> La notification est rendue en **HTML + QR (data URI PNG)** côté backend, puis
+> imprimée via le navigateur (Imprimer → Enregistrer en PDF). Le code QR encode
+> l'URL publique de vérification (`GM_PUBLIC_URL`).
 
 Les modules ⏳ sont à compléter en s'appuyant sur ce document.

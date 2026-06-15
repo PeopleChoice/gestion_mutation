@@ -66,5 +66,55 @@ pub async fn run(pool: &AnyPool, _cfg: &AppConfig) -> anyhow::Result<()> {
         tracing::info!("Compte admin créé : {email} (mot de passe : {password})");
     }
 
+    // Template de notification par défaut
+    let tpl_exists: Option<(i64,)> =
+        sqlx::query_as("SELECT id FROM document_templates WHERE type = 'notification_attribution'")
+            .fetch_optional(pool)
+            .await?;
+    if tpl_exists.is_none() {
+        sqlx::query(
+            "INSERT INTO document_templates (nom, type, entete_html, corps_html, pied_html, centre_fiscal, bureau, actif, created_at, updated_at) \
+             VALUES (?, 'notification_attribution', ?, ?, ?, ?, ?, 1, ?, ?)",
+        )
+        .bind("Notification d'attribution (par défaut)")
+        .bind(DEFAULT_ENTETE)
+        .bind(DEFAULT_CORPS)
+        .bind(DEFAULT_PIED)
+        .bind("Centre des Services Fiscaux")
+        .bind("Bureau des Domaines")
+        .bind(now())
+        .bind(now())
+        .execute(pool)
+        .await?;
+    }
+
     Ok(())
 }
+
+const DEFAULT_ENTETE: &str = r#"
+<div style="text-align:center; border-bottom:2px solid #1e3a8a; padding-bottom:8px; margin-bottom:16px;">
+  <div style="font-weight:bold;">RÉPUBLIQUE DU SÉNÉGAL</div>
+  <div style="font-size:12px;">Direction Générale des Impôts et des Domaines</div>
+  <div style="font-size:12px;">{{centre_fiscal}} — {{bureau}}</div>
+</div>"#;
+
+const DEFAULT_CORPS: &str = r#"
+<h2 style="text-align:center;">NOTIFICATION D'ATTRIBUTION</h2>
+<p style="text-align:right;">N° {{numero_notification}} &nbsp;&nbsp; Le {{date_mutation}}</p>
+<p>Il est porté à la connaissance de <strong>{{nom_complet_nouveau}}</strong>
+(pièce : {{cni_nouveau}}) que le lot <strong>{{numero_lot}}</strong> du projet
+<strong>{{nom_projet}}</strong>, commune de <strong>{{commune}}</strong>, lui est attribué.</p>
+<p>La présente notification fait foi de l'attribution enregistrée sous le numéro
+{{numero_notification}}.</p>"#;
+
+const DEFAULT_PIED: &str = r#"
+<div style="margin-top:32px; display:flex; justify-content:space-between; align-items:flex-end;">
+  <div style="text-align:center; font-size:11px;">
+    <img src="{{qr_code}}" alt="QR" style="width:120px; height:120px;" /><br/>
+    Vérifier l'authenticité<br/>
+    <span style="font-family:monospace; font-size:9px;">{{code_verification}}</span>
+  </div>
+  <div style="text-align:center;">
+    Le Chef de Bureau<br/><br/><br/>_______________________
+  </div>
+</div>"#;
