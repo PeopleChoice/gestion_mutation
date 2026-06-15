@@ -83,9 +83,20 @@ async fn main() -> anyhow::Result<()> {
         .route("/templates/:id/toggle", post(handlers::templates::toggle))
         // Imports Excel
         .route("/imports", get(handlers::imports::list).post(handlers::imports::upload))
+        .route("/imports/template", get(handlers::imports::template))
         .route("/imports/:id", get(handlers::imports::show))
         .route("/imports/lignes/:id/valider", post(handlers::imports::valider_ligne))
         .route("/imports/lignes/:id/refuser", post(handlers::imports::refuser_ligne))
+        // Rapports
+        .route("/rapports", post(handlers::rapports::generer))
+        // Utilisateurs (admin)
+        .route("/roles", get(handlers::users::roles))
+        .route("/users", get(handlers::users::list).post(handlers::users::store))
+        .route("/users/:id", put(handlers::users::update).delete(handlers::users::destroy))
+        .route("/users/:id/password", post(handlers::users::reset_password))
+        // Export / sauvegarde (admin)
+        .route("/admin/export.json", get(handlers::exports::export_json))
+        .route("/admin/export/:table", get(handlers::exports::export_csv))
         // Recherche
         .route("/recherche/rapide", get(handlers::recherche::rapide))
         // Vérification publique

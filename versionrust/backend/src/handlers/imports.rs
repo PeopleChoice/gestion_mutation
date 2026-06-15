@@ -327,6 +327,32 @@ pub struct RefusInput {
     pub motif: Option<String>,
 }
 
+/// GET /api/imports/template — télécharge un modèle Excel vierge.
+pub async fn template(_user: AuthUser, State(_state): State<AppState>) -> AppResult<axum::response::Response> {
+    use axum::body::Body;
+    use axum::http::header;
+    use rust_xlsxwriter::Workbook;
+
+    let mut wb = Workbook::new();
+    let sheet = wb.add_worksheet();
+    let cols = ["Lot", "Civilité", "Prénom", "Nom", "CNI / Passeport", "Téléphone"];
+    for (i, c) in cols.iter().enumerate() {
+        sheet
+            .write_string(0, i as u16, *c)
+            .map_err(|e| AppError::Internal(e.to_string()))?;
+    }
+    let buf = wb.save_to_buffer().map_err(|e| AppError::Internal(e.to_string()))?;
+
+    axum::response::Response::builder()
+        .header(
+            header::CONTENT_TYPE,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        .header(header::CONTENT_DISPOSITION, "attachment; filename=\"modele_import.xlsx\"")
+        .body(Body::from(buf))
+        .map_err(|e| AppError::Internal(e.to_string()))
+}
+
 /// POST /api/imports/lignes/:id/refuser (admin|gestionnaire)
 pub async fn refuser_ligne(
     user: AuthUser,

@@ -15,7 +15,10 @@ const allNav = [
   { name: 'mutations', label: 'Mutations', icon: '⇄' },
   { name: 'annulations', label: 'Annulations', icon: '⊘', roles: ['admin', 'gestionnaire'] },
   { name: 'communes', label: 'Communes', icon: '◉' },
+  { name: 'rapports', label: 'Rapports', icon: '📊', roles: ['admin', 'gestionnaire', 'receveur'] },
   { name: 'templates', label: 'Modèles', icon: '▥', roles: ['admin'] },
+  { name: 'utilisateurs', label: 'Utilisateurs', icon: '👤', roles: ['admin'] },
+  { name: 'sauvegarde', label: 'Sauvegarde', icon: '💾', roles: ['admin'] },
   { name: 'recherche', label: 'Recherche', icon: '🔍' },
 ]
 const nav = computed(() => allNav.filter((i) => !i.roles || auth.hasAny(i.roles)))

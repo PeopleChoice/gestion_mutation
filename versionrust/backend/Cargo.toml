@@ -8,6 +8,8 @@ description = "Backend Rust (Axum) — réécriture native de Gestion Mutations"
 axum = { version = "0.7", features = ["macros", "multipart"] }
 # Lecture des fichiers Excel (.xlsx) pour les imports
 calamine = "0.26"
+# Écriture des modèles Excel (.xlsx) téléchargeables
+rust_xlsxwriter = "0.79"
 tokio = { version = "1", features = ["full"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "fs", "trace"] }

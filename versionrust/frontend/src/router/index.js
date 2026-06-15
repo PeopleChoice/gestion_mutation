@@ -17,6 +17,9 @@ const routes = [
   { path: '/mutations', name: 'mutations', component: () => import('../views/Mutations.vue') },
   { path: '/annulations', name: 'annulations', component: () => import('../views/Annulations.vue') },
   { path: '/templates', name: 'templates', component: () => import('../views/Templates.vue') },
+  { path: '/rapports', name: 'rapports', component: () => import('../views/Rapports.vue') },
+  { path: '/utilisateurs', name: 'utilisateurs', component: () => import('../views/Utilisateurs.vue') },
+  { path: '/sauvegarde', name: 'sauvegarde', component: () => import('../views/Sauvegarde.vue') },
   { path: '/recherche', name: 'recherche', component: () => import('../views/Recherche.vue') },
 
   { path: '/:pathMatch(.*)*', name: 'notfound', component: () => import('../views/NotFound.vue'), meta: { public: true } },

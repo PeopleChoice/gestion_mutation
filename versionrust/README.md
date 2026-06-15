@@ -110,11 +110,12 @@ applicative décodée (format `base64:`). Voir `util::code_verification` et
 Implémenté (backend + frontend) : **setup, auth/RBAC, dashboard, communes,
 projets, parcelles (+ attribution), mutations (+ validation/refus + code de
 vérification), recherche, vérification publique, notification imprimable + QR,
-modèles de documents, annulations (demande/traitement)**.
+modèles de documents, annulations, imports Excel (+ modèle téléchargeable),
+rapports, gestion des utilisateurs, export de la base (JSON + CSV)**.
 
 À compléter (cf. [SPEC.md](SPEC.md) §État d'avancement) :
-- **Imports Excel** (parsing + matching) → crate `calamine`.
-- **Rapports**, **export/import BDD**, gestion des **utilisateurs**.
+- **Import/restauration** de la base à partir d'un export.
+- **Imports globaux** multi-projets (colonne « Code projet »).
 
 Ces modules suivent exactement les règles décrites dans `SPEC.md`.
 

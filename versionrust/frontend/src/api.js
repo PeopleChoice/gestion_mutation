@@ -34,4 +34,17 @@ export function errMessage(e) {
   return e?.response?.data?.message || e?.message || 'Erreur inconnue'
 }
 
+/** Télécharge un fichier protégé (envoie le JWT, déclenche le download). */
+export async function download(url, filename) {
+  const res = await api.get(url, { responseType: 'blob' })
+  const blobUrl = URL.createObjectURL(res.data)
+  const a = document.createElement('a')
+  a.href = blobUrl
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(blobUrl)
+}
+
 export default api

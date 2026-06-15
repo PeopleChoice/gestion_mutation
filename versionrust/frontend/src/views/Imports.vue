@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api, { errMessage } from '../api'
+import api, { errMessage, download } from '../api'
 
 const router = useRouter()
 const items = ref([])
@@ -33,7 +33,10 @@ onMounted(() => { load(); loadProjets() })
 </script>
 
 <template>
-  <h1 class="text-2xl font-bold mb-6">Imports Excel</h1>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Imports Excel</h1>
+    <button @click="download('/imports/template', 'modele_import.xlsx')" class="px-4 py-2 rounded-lg bg-slate-200 text-sm font-semibold">⬇ Modèle Excel</button>
+  </div>
   <div v-if="error" class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">{{ error }}</div>
   <div v-if="ok" class="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm">{{ ok }}</div>
 

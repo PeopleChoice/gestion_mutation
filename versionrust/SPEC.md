@@ -145,7 +145,11 @@ Variantes de colonnes accentuées/non. Imports globaux : projet résolu par colo
 | Document templates | ✅ | ✅ |
 | Annulations (demande/traitement) | ✅ | ✅ |
 | Imports Excel (upload/parsing/matching/validation) | ✅ | ✅ |
-| Rapports / Export-Import BDD | ⏳ TODO | ⏳ TODO |
+| Modèle Excel téléchargeable | ✅ | ✅ |
+| Rapports (filtres + impression) | ✅ | ✅ |
+| Gestion des utilisateurs (CRUD + rôles) | ✅ | ✅ |
+| Export BDD (JSON complet + CSV par table) | ✅ | ✅ |
+| Import/restauration BDD, imports globaux multi-projets | ⏳ TODO | ⏳ TODO |
 
 > Imports : upload `.xlsx` (multipart), détection auto de la ligne d'en-tête
 > (la plus remplie des 3 premières), matching `numero_lot + projet_id`, puis
