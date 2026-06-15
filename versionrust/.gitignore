@@ -1,0 +1,13 @@
+# Rust
+/backend/target
+/backend/Cargo.lock
+
+# Données runtime (config + base SQLite générées)
+/backend/data
+/data
+
+# Frontend
+/frontend/node_modules
+/frontend/dist
+*.log
+.DS_Store
